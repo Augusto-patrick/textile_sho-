@@ -1,0 +1,16 @@
+# PHP / local development
+.env
+.env.*
+*.log
+
+# XAMPP / local files
+xampp/
+tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor files
+.vscode/
+.idea/
