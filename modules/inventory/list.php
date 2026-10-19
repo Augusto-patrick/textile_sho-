@@ -64,7 +64,7 @@ include __DIR__ . '/../../includes/header.php';
                     <td>
                         <a href="edit.php?id=<?= $row['product_id'] ?>" class="btn-link">Edit</a>
                         &nbsp;|&nbsp;
-                        <a href="delete.php?id=<?= $row['product_id'] ?>"
+                        <a href="delete.php?id=<?= (int)$row['product_id'] ?>&amp;t=<?= urlencode(csrf_token()) ?>"
                            class="btn-link"
                            style="color: var(--danger);"
                            onclick="return confirm('Delete this product? This cannot be undone.');">Delete</a>

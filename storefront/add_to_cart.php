@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: index.php');
     exit;
 }
+csrf_verify();
 
 $customerId = $_SESSION['customer_id'];
 $productId  = (int)$_POST['product_id'];

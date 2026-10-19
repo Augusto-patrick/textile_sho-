@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: pos.php');
     exit;
 }
+csrf_verify();
 
 $cartJson     = $_POST['cart_json'] ?? '';
 $walkinName   = trim($_POST['walkin_name'] ?? '');

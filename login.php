@@ -10,6 +10,7 @@ if (isLoggedIn()) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
@@ -24,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
 
         if ($user && $user['status'] === 'active' && password_verify($password, $user['password'])) {
+            // New session id on privilege change (blocks session fixation)
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['full_name'] = $user['full_name'];
             $_SESSION['username'] = $user['username'];
@@ -52,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
         <form method="POST" action="login.php">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" required autofocus>

@@ -88,6 +88,7 @@ include __DIR__ . '/../../includes/header.php';
   to PHP in one go, instead of one request per item.
 -->
 <form id="billForm" method="POST" action="process_bill.php" style="display:none;">
+    <?= csrf_field() ?>
     <input type="hidden" name="cart_json" id="cart_json">
     <input type="hidden" name="walkin_name" id="hidden_walkin_name">
     <input type="hidden" name="walkin_phone" id="hidden_walkin_phone">
@@ -101,6 +102,19 @@ const products = <?= json_encode($products) ?>;
 // The cart is just a JS object: { productId: {name, price, qty, stock}, ... }
 let cart = {};
 
+// Escape text before putting it into innerHTML. Product names come from
+// the database - without this, a name like <img src=x onerror=alert(1)>
+// saved by a staff member would execute as script in every other
+// staff member's browser (stored DOM XSS).
+function esc(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function renderProducts(filter = '') {
     const tbody = document.getElementById('productTableBody');
     tbody.innerHTML = '';
@@ -111,11 +125,11 @@ function renderProducts(filter = '') {
     filtered.forEach(p => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${p.product_name}</td>
-            <td>${p.sku || '-'}</td>
+            <td>${esc(p.product_name)}</td>
+            <td>${esc(p.sku || '-')}</td>
             <td>₹${parseFloat(p.selling_price).toFixed(2)}</td>
-            <td>${p.stock_quantity}</td>
-            <td><button class="btn" style="padding:5px 12px;" onclick="addToCart(${p.product_id})" ${p.stock_quantity <= 0 ? 'disabled' : ''}>Add</button></td>
+            <td>${parseInt(p.stock_quantity, 10)}</td>
+            <td><button class="btn" style="padding:5px 12px;" onclick="addToCart(${parseInt(p.product_id, 10)})" ${p.stock_quantity <= 0 ? 'disabled' : ''}>Add</button></td>
         `;
         tbody.appendChild(row);
     });
@@ -160,10 +174,10 @@ function renderCart() {
             total += lineTotal;
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.name}</td>
+                <td>${esc(item.name)}</td>
                 <td>${item.qty}</td>
                 <td>₹${lineTotal.toFixed(2)}</td>
-                <td><a href="#" onclick="removeFromCart(${id}); return false;" style="color:var(--danger);">✕</a></td>
+                <td><a href="#" onclick="removeFromCart(${parseInt(id, 10)}); return false;" style="color:var(--danger);">✕</a></td>
             `;
             tbody.appendChild(row);
         });

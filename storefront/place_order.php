@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: cart.php');
     exit;
 }
+csrf_verify();
 
 $customerId       = $_SESSION['customer_id'];
 $shippingAddress  = trim($_POST['shipping_address']);

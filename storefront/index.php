@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/../includes/csrf.php';
 
 $products = [];
 $result = $conn->query("SELECT product_id, product_name, selling_price, image_path FROM products WHERE is_online = 1 AND status = 'active' ORDER BY created_at DESC");

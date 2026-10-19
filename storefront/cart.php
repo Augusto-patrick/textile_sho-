@@ -61,14 +61,15 @@ while ($row = $cartItems->fetch_assoc()) {
                     <td>₹<?= number_format($item['selling_price'], 2) ?></td>
                     <td>
                         <form method="POST" action="update_cart.php" style="display:flex; gap:6px; align-items:center;">
-                            <input type="hidden" name="cart_item_id" value="<?= $item['cart_item_id'] ?>">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="cart_item_id" value="<?= (int)$item['cart_item_id'] ?>">
                             <input type="number" name="quantity" value="<?= $item['quantity'] ?>" min="1" max="<?= $item['stock_quantity'] ?>" style="width:60px;">
                             <button type="submit" class="btn-link">Update</button>
                         </form>
                     </td>
                     <td>₹<?= number_format($item['line_total'], 2) ?></td>
                     <td>
-                        <a href="remove_from_cart.php?id=<?= $item['cart_item_id'] ?>" style="color:var(--danger);"
+                        <a href="remove_from_cart.php?id=<?= (int)$item['cart_item_id'] ?>&amp;t=<?= urlencode(csrf_token()) ?>" style="color:var(--danger);"
                            onclick="return confirm('Remove this item?');">✕</a>
                     </td>
                 </tr>

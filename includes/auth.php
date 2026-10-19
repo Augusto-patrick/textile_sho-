@@ -3,9 +3,9 @@
 // Staff/Admin authentication helpers
 // Include this at the top of any protected staff page.
 // ============================================================
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// csrf.php starts (and hardens) the session cookie itself,
+// and defines csrf_token() / csrf_field() / csrf_verify() / csrf_verify_get().
+require_once __DIR__ . '/csrf.php';
 
 function isLoggedIn() {
     return isset($_SESSION['user_id']);

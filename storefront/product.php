@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/../includes/csrf.php';
 
 $productId = (int)($_GET['id'] ?? 0);
 
@@ -60,7 +60,8 @@ if (!$product) {
         <?php if (isset($_SESSION['customer_id'])): ?>
             <?php if ($product['stock_quantity'] > 0): ?>
                 <form method="POST" action="add_to_cart.php" style="display:flex; gap:10px; align-items:center; margin-top:16px;">
-                    <input type="hidden" name="product_id" value="<?= $product['product_id'] ?>">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="product_id" value="<?= (int)$product['product_id'] ?>">
                     <label for="quantity" style="margin:0;">Qty:</label>
                     <input type="number" id="quantity" name="quantity" value="1" min="1" max="<?= $product['stock_quantity'] ?>" style="width:80px;">
                     <button type="submit" class="btn">Add to Cart</button>

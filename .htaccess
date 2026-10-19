@@ -1,0 +1,83 @@
+# ============================================================
+# Textile Shop Manager - root .htaccess (Apache / XAMPP)
+# ============================================================
+
+Options -Indexes
+RewriteEngine On
+
+# ---- Force UTF-8 for all text output ----
+AddDefaultCharset UTF-8
+
+# ============================================================
+# 1) BLOCK SENSITIVE FILES / FOLDERS
+# ============================================================
+
+# SQL dumps, logs, backups, env files must never be served
+<FilesMatch "\.(sql|log|ini|bak|old|env|lock|sh)$">
+    Require all denied
+</FilesMatch>
+
+# Direct browser access to these folders is forbidden
+# (their PHP files are only meant to be require'd, never opened directly)
+<IfModule mod_rewrite.c>
+    RewriteRule ^config/ - [F,L]
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^includes/ - [F,L]
+</IfModule>
+
+# Dotfiles (.htaccess itself, .git, .env, editors' temp files)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# ============================================================
+# 2) SECURITY HEADERS
+# ============================================================
+<IfModule mod_headers.c>
+    # Stop the browser from guessing file types (MIME sniffing)
+    Header set X-Content-Type-Options "nosniff"
+
+    # Clickjacking protection: only this site may frame its pages
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # Send only the origin (not the full URL) as Referer off-site
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Legacy XSS auditor is off - we do our own output encoding
+    Header set X-XSS-Protection "0"
+
+    # Remove server / PHP fingerprint
+    Header unset X-Powered-By
+    Header unset Server
+
+    # ---- Content Security Policy ----
+    # Where scripts / styles / images / fonts may load from.
+    # 'unsafe-inline' for styles is required: the app uses inline style="" attributes.
+    # 'unsafe-inline' for scripts is required: the app (POS product list, cart,
+    # delete-confirm dialogs) uses inline <script> blocks and onclick= handlers.
+    # NOTE: this means CSP no longer blocks injected inline <script> tags —
+    # XSS defence here is the output escaping (htmlspecialchars / esc()) on
+    # every page, plus CSRF tokens. If the inline JS is ever moved to external
+    # .js files, 'unsafe-inline' can be dropped from script-src again.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+
+    # Turn off browser features the app never uses
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+</IfModule>
+
+# ============================================================
+# 3) HTTPS (uncomment on a real server with SSL, not on localhost)
+# ============================================================
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# ============================================================
+# 4) CACHING (static assets only)
+# ============================================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/svg+xml "access plus 7 days"
+    ExpiresByType image/png "access plus 7 days"
+    ExpiresByType image/jpeg "access plus 7 days"
+    ExpiresByType text/css "access plus 7 days"
+</IfModule>

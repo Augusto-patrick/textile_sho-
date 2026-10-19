@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/../includes/csrf.php';
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $name     = trim($_POST['full_name']);
     $email    = trim($_POST['email']);
     $password = $_POST['password'];
@@ -27,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param('sssssss', $name, $email, $hashedPassword, $phone, $address, $city, $pincode);
 
         if ($stmt->execute()) {
+            session_regenerate_id(true);
             $_SESSION['customer_id']   = $conn->insert_id;
             $_SESSION['customer_name'] = $name;
             header('Location: index.php');
@@ -56,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
         <form method="POST" action="register.php">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <label>Full Name *</label>
                 <input type="text" name="full_name" required value="<?= htmlspecialchars($_POST['full_name'] ?? '') ?>">

@@ -19,6 +19,7 @@ $suppliers  = $conn->query("SELECT supplier_id, supplier_name FROM suppliers ORD
 // UPDATE: runs only when the form is submitted (POST)
 // ------------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $name          = trim($_POST['product_name']);
     $categoryId    = $_POST['category_id'] ?: null;
     $supplierId    = $_POST['supplier_id'] ?: null;
@@ -48,11 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $isOnline, $status, $id
         );
 
-        if ($stmt->execute()) {
-            header('Location: list.php?msg=' . urlencode('Product updated.'));
-            exit;
-        } else {
-            $error = 'Error updating product: ' . $conn->error;
+        try {
+            if ($stmt->execute()) {
+                header('Location: list.php?msg=' . urlencode('Product updated.'));
+                exit;
+            } else {
+                $error = 'Error updating product: ' . $conn->error;
+            }
+        } catch (mysqli_sql_exception $e) {
+            $error = ($e->getCode() === 1062)
+                ? 'A product with that SKU already exists.'
+                : 'Error updating product: ' . $e->getMessage();
         }
         $stmt->close();
     }
@@ -92,6 +99,7 @@ include __DIR__ . '/../../includes/header.php';
     <?php endif; ?>
 
     <form method="POST" action="edit.php?id=<?= $id ?>">
+        <?= csrf_field() ?>
         <div class="form-group">
             <label for="product_name">Product Name *</label>
             <input type="text" id="product_name" name="product_name" required

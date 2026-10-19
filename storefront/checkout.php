@@ -81,6 +81,7 @@ $shippingFee = 0;
     </div>
 
     <form method="POST" action="place_order.php">
+        <?= csrf_field() ?>
         <h4>Shipping Address</h4>
         <div class="form-group">
             <label>Full Address *</label>

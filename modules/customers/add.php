@@ -7,6 +7,7 @@ $pageTitle = 'Add Customer';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $name     = trim($_POST['full_name']);
     $email    = trim($_POST['email']);
     $phone    = trim($_POST['phone']);
@@ -26,15 +27,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         $stmt->bind_param('sssssss', $name, $email, $hashedPassword, $phone, $address, $city, $pincode);
 
-        if ($stmt->execute()) {
-            header('Location: list.php?msg=' . urlencode('Customer added successfully.'));
-            exit;
-        } else {
-            if ($conn->errno === 1062) {
-                $error = 'A customer with that email already exists.';
+        // PHP 8.1+ mysqli throws exceptions on errors (e.g. duplicate email),
+        // so duplicate-key handling must catch, not check errno afterwards.
+        try {
+            if ($stmt->execute()) {
+                header('Location: list.php?msg=' . urlencode('Customer added successfully.'));
+                exit;
             } else {
                 $error = 'Error saving customer: ' . $conn->error;
             }
+        } catch (mysqli_sql_exception $e) {
+            $error = ($e->getCode() === 1062)
+                ? 'A customer with that email already exists.'
+                : 'Error saving customer: ' . $e->getMessage();
         }
         $stmt->close();
     }
@@ -51,6 +56,7 @@ include __DIR__ . '/../../includes/header.php';
     <?php endif; ?>
 
     <form method="POST" action="add.php">
+        <?= csrf_field() ?>
         <div class="form-group">
             <label for="full_name">Full Name *</label>
             <input type="text" id="full_name" name="full_name" required

@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
-if (session_status() === PHP_SESSION_NONE) session_start();
+require_once __DIR__ . '/../includes/csrf.php';
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $email    = trim($_POST['email']);
     $password = $_POST['password'];
 
@@ -15,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     if ($customer && password_verify($password, $customer['password'])) {
+        session_regenerate_id(true);
         $_SESSION['customer_id']   = $customer['customer_id'];
         $_SESSION['customer_name'] = $customer['full_name'];
         header('Location: index.php');
@@ -40,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="alert alert-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
         <form method="POST" action="login.php">
+            <?= csrf_field() ?>
             <div class="form-group">
                 <label>Email</label>
                 <input type="email" name="email" required autofocus>

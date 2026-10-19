@@ -5,8 +5,11 @@ requireLogin();
 
 // ------------------------------------------------------------
 // DELETE: triggered by clicking the "Delete" link in list.php,
-// which passes the product's id in the URL, e.g. delete.php?id=7
+// which passes the product's id in the URL, e.g. delete.php?id=7&t=...
+// The token (t) proves the click came from our own page and not
+// from an attacker's site hot-linking to this URL (CSRF).
 // ------------------------------------------------------------
+csrf_verify_get();
 $id = (int)($_GET['id'] ?? 0);
 
 if ($id > 0) {

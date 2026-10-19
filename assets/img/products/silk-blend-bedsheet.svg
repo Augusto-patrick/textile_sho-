@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" rx="14" fill="hsl(300,35%,92%)"/>
+  <rect x="6" y="6" width="388" height="288" rx="10" fill="none" stroke="hsl(300,45%,55%)" stroke-width="3"/>
+  <!-- folded-cloth icon -->
+  <path d="M160 70 L200 50 L240 70 L240 175 L160 175 Z" fill="hsl(300,45%,55%)" opacity="0.9"/>
+  <path d="M160 70 L200 95 L240 70" fill="none" stroke="#ffffff" stroke-width="4"/>
+  <path d="M200 95 L200 175" stroke="#ffffff" stroke-width="3" opacity="0.7"/>
+  <path d="M168 120 L232 120 M168 145 L232 145" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+  <text x="200" y="245" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="600" fill="hsl(300,40%,35%)">Silk Blend</text><text x="200" y="278" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="600" fill="hsl(300,40%,35%)">Bedsheet</text>
+</svg>

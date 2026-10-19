@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireCustomerLogin();
 
+csrf_verify_get();
 $customerId = $_SESSION['customer_id'];
 $cartItemId = (int)($_GET['id'] ?? 0);
 

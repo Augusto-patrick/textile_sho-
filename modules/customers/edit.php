@@ -13,6 +13,7 @@ if ($id <= 0) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    csrf_verify();
     $name     = trim($_POST['full_name']);
     $email    = trim($_POST['email']);
     $phone    = trim($_POST['phone']);
@@ -29,13 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
         $stmt->bind_param('ssssssi', $name, $email, $phone, $address, $city, $pincode, $id);
 
-        if ($stmt->execute()) {
-            header('Location: list.php?msg=' . urlencode('Customer updated.'));
-            exit;
-        } else {
-            $error = ($conn->errno === 1062)
+        try {
+            if ($stmt->execute()) {
+                header('Location: list.php?msg=' . urlencode('Customer updated.'));
+                exit;
+            } else {
+                $error = 'Error updating customer: ' . $conn->error;
+            }
+        } catch (mysqli_sql_exception $e) {
+            $error = ($e->getCode() === 1062)
                 ? 'Another customer already uses that email.'
-                : 'Error updating customer: ' . $conn->error;
+                : 'Error updating customer: ' . $e->getMessage();
         }
         $stmt->close();
     }
@@ -67,6 +72,7 @@ include __DIR__ . '/../../includes/header.php';
     <?php endif; ?>
 
     <form method="POST" action="edit.php?id=<?= $id ?>">
+        <?= csrf_field() ?>
         <div class="form-group">
             <label for="full_name">Full Name *</label>
             <input type="text" id="full_name" name="full_name" required

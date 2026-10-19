@@ -50,7 +50,11 @@ include __DIR__ . '/../../includes/header.php';
                     <td><?= strtoupper(htmlspecialchars($row['payment_method'])) ?></td>
                     <td><?= htmlspecialchars($row['staff_name'] ?? '-') ?></td>
                     <td><?= date('d M Y, h:i A', strtotime($row['created_at'])) ?></td>
-                    <td><a href="view_bill.php?id=<?= $row['bill_id'] ?>" class="btn-link">View</a></td>
+                    <td>
+                        <a href="view_bill.php?id=<?= $row['bill_id'] ?>" class="btn-link">View</a>
+                        &nbsp;|&nbsp;
+                        <a href="edit_bill.php?id=<?= $row['bill_id'] ?>" class="btn-link">Edit</a>
+                    </td>
                 </tr>
             <?php endwhile; ?>
         <?php else: ?>
