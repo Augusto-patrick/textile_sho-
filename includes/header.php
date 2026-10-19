@@ -19,6 +19,7 @@ if (!isset($pageTitle)) { $pageTitle = 'Textile Shop Manager'; }
             <div class="topbar-user">
                 <?php if (isset($_SESSION['full_name'])): ?>
                     <span><?= htmlspecialchars($_SESSION['full_name']) ?> (<?= htmlspecialchars($_SESSION['role']) ?>)</span>
+                    <a href="/textile_shop/profile.php" class="btn-link">My Account</a>
                     <a href="/textile_shop/logout.php" class="btn-link">Logout</a>
                 <?php endif; ?>
             </div>
